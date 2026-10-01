@@ -1,4 +1,4 @@
-# agent-coordination
+# coordination
 
 A drop-in contract that lets Claude Code and Codex share work on one project
 through files in the repository.
@@ -7,7 +7,7 @@ through files in the repository.
 
 Tell Claude or Codex, from inside your project:
 
-> Set up Codex–Claude coordination from https://github.com/OWNER/agent-coordination
+> Set up Codex–Claude coordination from https://github.com/tim-schultz/coordination
 
 ### For the agent doing the setup
 
@@ -15,7 +15,7 @@ Run these from the project root, then report what changed:
 
 ```sh
 src=$(mktemp -d)
-git clone --depth 1 https://github.com/OWNER/agent-coordination "$src"
+git clone --depth 1 https://github.com/tim-schultz/coordination "$src"
 "$src/install.sh" .
 rm -rf "$src"
 ```
