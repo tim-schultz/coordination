@@ -14,12 +14,17 @@ Tell Claude or Codex, from inside your project:
 Run these from the project root, then report what changed:
 
 ```sh
-git clone --depth 1 https://github.com/OWNER/agent-coordination /tmp/agent-coordination
-/tmp/agent-coordination/install.sh .
-rm -rf /tmp/agent-coordination
+src=$(mktemp -d)
+git clone --depth 1 https://github.com/OWNER/agent-coordination "$src"
+"$src/install.sh" .
+rm -rf "$src"
 ```
 
-The installer is safe to re-run; that is also how you update the rules.
+The installer is safe to re-run; that is also how you update the rules. If
+`CLAUDE.md` or `AGENTS.md` already had coordination instructions outside the
+markers, remove them so the block is the only copy. If an older
+`COORDINATION.md` without markers exists, the installer stops; merge its open
+threads into the new format by hand.
 
 ## What it installs
 
@@ -27,12 +32,13 @@ The installer is safe to re-run; that is also how you update the rules.
 | --- | --- |
 | `COORDINATION.md` | The contract and one row per open thread |
 | `coordination/<ID>.md` | Append-only entries for each open thread |
-| `docs/archive/coordination/` | Closed threads, searchable with grep |
-| `CLAUDE.md` block | Imports `COORDINATION.md` with `@`, so Claude always has it loaded |
-| `AGENTS.md` block | Tells Codex to read `COORDINATION.md` at session start |
+| `coordination/archive/` | Closed threads, searchable with grep |
+| `CLAUDE.md` and `AGENTS.md` block | A pointer to `COORDINATION.md` |
 
-The rules live only in `COORDINATION.md`. The `CLAUDE.md` and `AGENTS.md`
-blocks are short pointers, so there is one copy to keep current. Each managed
+The rules live only in `COORDINATION.md`. Both agent files get the same short
+pointer: Claude imports the file through its `@COORDINATION.md` line, and
+Codex follows the link. Because the block is identical, an `AGENTS.md`
+symlinked to `CLAUDE.md` works too. Each managed
 block sits between `<!-- coordination:start -->` and
 `<!-- coordination:end -->`; anything outside the markers, including the
 open-threads table, is left alone.
@@ -43,8 +49,8 @@ The full text is in [template/COORDINATION.md](template/COORDINATION.md).
 
 1. **Read before working.** Read `COORDINATION.md` and every thread file you
    touch at session start and before any claim or handoff.
-2. **Threads.** One thread per task or milestone, append-only, entries about
-   10 lines. Long evidence goes in the plan or a separate file.
+2. **Threads.** One thread per task, append-only, entries about 10 lines.
+   Long evidence goes in a separate file.
 3. **Rows.** The owner edits its row in place; whoever hands off updates Next.
 4. **Claims.** Name exact files; one owner per file; never revert others' work.
 5. **Close.** Append CLOSE, delete the row, move the file to the archive.
